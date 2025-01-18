@@ -3,6 +3,7 @@
 #include <iomanip>
 
 Core_module::Core_module(I2C_bus* bus):
+    can_receiver( new CAN::Receiver("can0")),
     interface(new Interface_board(bus)),
     rpi(new RPi_host())
 {}
@@ -10,6 +11,25 @@ Core_module::Core_module(I2C_bus* bus):
 Core_module::~Core_module() {
     delete interface;
     delete rpi;
+}
+
+void Core_module::Run() {
+    while(true){
+        Application_message message = can_receiver->Receiver_loop();
+
+        switch (message.Message_type()) {
+            case Codes::Message_type::Probe_modules_request:{
+                std::cout << "Module probe request received" << std::endl;
+                App_messages::Common::Probe_modules_response probe_response(rpi->Device_UID());
+                can_receiver->Send_message(probe_response);
+                break;
+            }
+
+            default:
+                std::cout << "Unknown message received" << std::endl;
+                break;
+        }
+    }
 }
 
 void Core_module::Test() const {
