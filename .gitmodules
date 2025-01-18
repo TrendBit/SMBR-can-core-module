@@ -1,0 +1,3 @@
+[submodule "source/codes"]
+	path = source/codes
+	url = git@github.com:TrendBit/SMBR-CANBUS-Codes.git
