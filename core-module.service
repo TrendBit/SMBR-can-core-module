@@ -1,0 +1,12 @@
+[Unit]
+Description=Core Module Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=core-module
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
