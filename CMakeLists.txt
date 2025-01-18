@@ -14,13 +14,12 @@ find_library(PIGPIO_LIBRARY pigpio REQUIRED)
 find_library(RT_LIBRARY rt REQUIRED)
 
 # Source files
-file(GLOB SOURCES
+file(GLOB_RECURSE SOURCES
     "source/*.cpp"
-    "source/hw/*.cpp"
 )
-file(GLOB HEADERS
+
+file(GLOB_RECURSE HEADERS
     "source/*.hpp"
-    "source/hw/*.hpp"
 )
 
 # Create executable
@@ -38,7 +37,7 @@ target_link_libraries(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/source
-        ${CMAKE_CURRENT_SOURCE_DIR}/source/hw
+        ${CMAKE_CURRENT_SOURCE_DIR}/source/codes/messages
 )
 
 # Set output directories
