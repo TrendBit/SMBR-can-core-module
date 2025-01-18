@@ -33,8 +33,18 @@ private:
     const uint32_t speed;
 
 public:
-
+    /**
+     * @brief Construct a new I2C_bus object
+     *
+     * @param device    Path to I2C device
+     * @param speed     Speed of I2C bus in Hz
+     */
     I2C_bus(const std::string &device, uint32_t speed = 100'000);
+
+    /**
+     * @brief Destroy the i2c bus object
+     */
+    ~I2C_bus();
 
     /**
      * @brief   Write data to I2C bus

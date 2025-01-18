@@ -114,7 +114,7 @@ private:
      */
     Config_register custom_default_config = {
         .Reserved = 0x03,
-        .Data_rate_setting = Data_rate::DR_920,
+        .Data_rate_setting = Data_rate::DR_128,
         .Mode_setting = Mode::Continuous,
         .Programmable_gain = PGA::FSR_2_048,
         .Input_multiplexer = Channels::AIN0_GND,

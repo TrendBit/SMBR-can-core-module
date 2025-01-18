@@ -25,10 +25,26 @@ private:
     const uint8_t address;
 
 public:
+    /**
+     * @brief Construct a new i2c device object
+     *
+     * @param bus       I2C bus on which device is connected
+     * @param address   Address of device on I2C bus
+     */
     I2C_device(I2C_bus &bus, uint8_t address);
 
+    /**
+     * @brief   Get address of device on I2C bus
+     *
+     * @return short    Address of device (7-bit)
+     */
     short Address() const { return address; };
 
+    /**
+     * @brief   Get I2C bus on which device is connected
+     *
+     * @return I2C_bus& Reference to I2C bus
+     */
     I2C_bus & Bus() const { return bus; };
 
 protected:

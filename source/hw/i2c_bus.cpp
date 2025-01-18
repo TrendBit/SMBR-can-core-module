@@ -9,6 +9,13 @@ I2C_bus::I2C_bus(const std::string &device, uint32_t speed)
     }
 }
 
+I2C_bus::~I2C_bus() {
+    if (descriptor >= 0) {
+        close(descriptor);
+        descriptor = -1;
+    }
+}
+
 int I2C_bus::Write(uint8_t address, const uint8_t *data, uint length, uint timeout_us) {
     if (ioctl(descriptor, I2C_SLAVE, address) < 0) {
         return -1; // Address not acknowledged
