@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-float RPi_host::Core_temperature() {
+float RPi_host::Core_temperature(){
     std::ifstream temp_file("/sys/class/thermal/thermal_zone0/temp");
     if (!temp_file.is_open()) {
         return 0.0f;
@@ -14,7 +14,7 @@ float RPi_host::Core_temperature() {
     return static_cast<float>(temp) / 1000.0f;
 }
 
-float RPi_host::Core_load() {
+float RPi_host::Core_load(){
     // Get number of cores
     std::ifstream nproc("/sys/devices/system/cpu/online"); // On Rpi4B, this file contains "0-3"
     if (!nproc.is_open()) {
@@ -26,7 +26,7 @@ float RPi_host::Core_load() {
     size_t pos = cores_str.find('-');
     if (pos != std::string::npos) {
         size_t last_core = std::stoi(cores_str.substr(pos + 1));
-        size_t cores = last_core + 1;  // 0-3 means 4 cores
+        size_t cores     = last_core + 1; // 0-3 means 4 cores
 
         // Get load average for last 1 minute
         std::ifstream loadavg("/proc/loadavg");
@@ -43,7 +43,7 @@ float RPi_host::Core_load() {
     return 0.0f;
 }
 
-std::string RPi_host::Read_serial() {
+std::string RPi_host::Read_serial(){
     std::ifstream cpuinfo("/proc/cpuinfo");
     std::string line;
 
@@ -55,39 +55,47 @@ std::string RPi_host::Read_serial() {
     return "";
 }
 
-std::array<uint8_t, 6> RPi_host::Hash(const std::string& input) {
-    std::hash<std::string> hasher;
-    size_t hash_value = hasher(input);
+std::array<uint8_t, 6> RPi_host::Hash(const std::string& input){
+    const std::string salt   = "SMPBR-core";
+    std::string salted_input = input + salt;
+
+    uint64_t hash = 0x1234567890ABCDEF; // Initial seed
+
+    // Deterministic hash function, variant of std::hash
+    for (char c : salted_input) {
+        hash ^= static_cast<uint64_t>(c);
+        hash  = (hash << 7) | (hash >> 57);
+        hash *= 0x1234567890ABCDEF;
+    }
 
     std::array<uint8_t, 6> result;
-    result[0] = (hash_value >> 40) & 0xFF;
-    result[1] = (hash_value >> 32) & 0xFF;
-    result[2] = (hash_value >> 24) & 0xFF;
-    result[3] = (hash_value >> 16) & 0xFF;
-    result[4] = (hash_value >> 8) & 0xFF;
-    result[5] = hash_value & 0xFF;
+    result[0] = (hash >> 40) & 0xFF;
+    result[1] = (hash >> 32) & 0xFF;
+    result[2] = (hash >> 24) & 0xFF;
+    result[3] = (hash >> 16) & 0xFF;
+    result[4] = (hash >> 8) & 0xFF;
+    result[5] = hash & 0xFF;
     return result;
 }
 
-std::array<uint8_t, 6> RPi_host::Device_UID() {
+std::array<uint8_t, 6> RPi_host::Device_UID(){
     std::string serial = Read_serial();
     if (serial.empty()) {
-        return {0, 0, 0, 0, 0, 0};
+        return { 0, 0, 0, 0, 0, 0 };
     }
 
-    // Use last 4 bytes of serial + "RPi4B" as salt
     std::string input = serial.substr(serial.length() - 8);
     return Hash(input);
 }
 
-uint16_t RPi_host::Short_ID() {
+uint16_t RPi_host::Short_ID(){
     auto uid = Device_UID();
     // XOR first 3 bytes with last 3 bytes for better distribution
     uint16_t short_id = ((uid[0] ^ uid[3]) << 8) | (uid[1] ^ uid[4]);
     return short_id;
 }
 
-uint32_t RPi_host::Serial_number() {
+uint32_t RPi_host::Serial_number(){
     std::string serial = Read_serial();
     if (serial.empty()) {
         return 0;
@@ -97,21 +105,21 @@ uint32_t RPi_host::Serial_number() {
     return std::stoul(serial, nullptr, 16);
 }
 
-std::optional<std::array<uint8_t, 4>> RPi_host::IP_address() {
+std::optional<std::array<uint8_t, 4> > RPi_host::IP_address(){
     int fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0) {
-        return {};
+        return { };
     }
 
     struct ifreq ifr;
     ifr.ifr_addr.sa_family = AF_INET;
 
-    const char* interfaces[] = {"eth0", "wlan0"};
+    const char *interfaces[] = { "eth0", "wlan0" };
     for (const auto& interface : interfaces) {
-        strncpy(ifr.ifr_name, interface, IFNAMSIZ-1);
+        strncpy(ifr.ifr_name, interface, IFNAMSIZ - 1);
         if (ioctl(fd, SIOCGIFADDR, &ifr) == 0) {
             close(fd);
-            struct sockaddr_in* addr = (struct sockaddr_in*)&ifr.ifr_addr;
+            struct sockaddr_in *addr = (struct sockaddr_in *) &ifr.ifr_addr;
             uint32_t ip = addr->sin_addr.s_addr;
             return std::array<uint8_t, 4>{
                 static_cast<uint8_t>(ip & 0xFF),
@@ -123,14 +131,14 @@ std::optional<std::array<uint8_t, 4>> RPi_host::IP_address() {
     }
 
     close(fd);
-    return {};
+    return { };
 }
 
-std::string RPi_host::Hostname() {
+std::string RPi_host::Hostname(){
     char hostname[256];
     if (gethostname(hostname, sizeof(hostname)) == 0) {
         std::string host(hostname);
-        return host.substr(0, 8);  // Limit to 8 characters
+        return host.substr(0, 8); // Limit to 8 characters
     }
     return "";
 }
