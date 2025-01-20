@@ -27,7 +27,7 @@ void Core_module::Probe() const {
     std::cout << "Vin status: " << (interface->Vin_status() ? "Connected" : "Disconnected") << std::endl;
     std::cout << "Board temperature: " << std::fixed << std::setprecision(1) << interface->Board_temperature() << " °C" << std::endl;
     std::cout << "Core temperature: " << std::fixed << std::setprecision(1) << rpi->Core_temperature() << " °C" << std::endl;
-    std::cout << "Core load: " << std::fixed << std::setprecision(1) << rpi->Core_load() << " %" << std::endl;
+    std::cout << "Core load: " << std::fixed << std::setprecision(1) << rpi->Core_load() * 100.0f << " %" << std::endl;
 
     // Print UID
     auto uid = rpi->Device_UID();

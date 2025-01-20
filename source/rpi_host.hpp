@@ -45,6 +45,7 @@ public:
 
     /**
      * @brief   Read core load from Raspberry Pi (all core 1 minute average)
+     *          Load is in range 0-1.0 and represents all core at one, (3 cores idle, 1 core at 100% = 0.25)
      *
      * @return float
      */

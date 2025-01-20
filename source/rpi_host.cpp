@@ -1,5 +1,8 @@
 #include "rpi_host.hpp"
 
+#include <fstream>
+#include <iostream>
+
 float RPi_host::Core_temperature() {
     std::ifstream temp_file("/sys/class/thermal/thermal_zone0/temp");
     if (!temp_file.is_open()) {
@@ -12,14 +15,32 @@ float RPi_host::Core_temperature() {
 }
 
 float RPi_host::Core_load() {
-    std::ifstream loadavg("/proc/loadavg");
-    if (!loadavg.is_open()) {
+    // Get number of cores
+    std::ifstream nproc("/sys/devices/system/cpu/online"); // On Rpi4B, this file contains "0-3"
+    if (!nproc.is_open()) {
         return 0.0f;
     }
+    std::string cores_str;
+    std::getline(nproc, cores_str);
 
-    float load;
-    loadavg >> load;
-    return load;
+    size_t pos = cores_str.find('-');
+    if (pos != std::string::npos) {
+        size_t last_core = std::stoi(cores_str.substr(pos + 1));
+        size_t cores = last_core + 1;  // 0-3 means 4 cores
+
+        // Get load average for last 1 minute
+        std::ifstream loadavg("/proc/loadavg");
+        if (!loadavg.is_open()) {
+            return 0.0f;
+        }
+
+        float load;
+        loadavg >> load;
+
+        return (load / cores);
+    }
+
+    return 0.0f;
 }
 
 std::string RPi_host::Read_serial() {
@@ -35,7 +56,6 @@ std::string RPi_host::Read_serial() {
 }
 
 std::array<uint8_t, 6> RPi_host::Hash(const std::string& input) {
-    // Use std::hash instead of SHA256
     std::hash<std::string> hasher;
     size_t hash_value = hasher(input);
 
@@ -56,7 +76,7 @@ std::array<uint8_t, 6> RPi_host::Device_UID() {
     }
 
     // Use last 4 bytes of serial + "RPi4B" as salt
-    std::string input = serial.substr(serial.length() - 8) + "RPi4B";
+    std::string input = serial.substr(serial.length() - 8);
     return Hash(input);
 }
 
