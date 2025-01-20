@@ -75,6 +75,12 @@ public:
      */
     std::string Hostname();
 
+    /**
+     * @brief   Get serial number of Raspberry Pi
+     * @return  uint32_t Serial number
+     */
+    uint32_t Serial_number();
+
 private:
     /**
      * @brief   Read serial number from /proc/cpuinfo

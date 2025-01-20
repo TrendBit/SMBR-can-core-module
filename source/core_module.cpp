@@ -55,6 +55,7 @@ void Core_module::Probe() const {
     }
 
     std::cout << "Hostname: " << rpi->Hostname() << std::endl;
+    std::cout << "Serial number: " << rpi->Serial_number() << std::endl;
 }
 
 void Core_module::Run() {
@@ -105,8 +106,6 @@ void Core_module::Run() {
                 can_interface->Send_message(board_temp_response);
                 break;
             }
-
-
 
             default:
                 std::cout << "Unknown message received" << std::endl;

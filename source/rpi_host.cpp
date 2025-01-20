@@ -67,6 +67,16 @@ uint16_t RPi_host::Short_ID() {
     return short_id;
 }
 
+uint32_t RPi_host::Serial_number() {
+    std::string serial = Read_serial();
+    if (serial.empty()) {
+        return 0;
+    }
+
+    // Convert hex string to integer
+    return std::stoul(serial, nullptr, 16);
+}
+
 std::optional<std::array<uint8_t, 4>> RPi_host::IP_address() {
     int fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0) {
