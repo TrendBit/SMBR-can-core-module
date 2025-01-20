@@ -12,6 +12,11 @@ sudo make install
 # Service
 ```bash
 sudo make install-service
+# Restart daemon to load new service description
+sudo systemctl daemon-reload
+# Enable service startup after next reboot
+sudo systemctl enable core-module
+# Start service now
 sudo systemctl start core-module
 # Check if service is running
 sudo systemctl status core-module

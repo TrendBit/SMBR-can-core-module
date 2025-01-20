@@ -62,8 +62,6 @@ add_custom_target(install-service
     COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_CURRENT_SOURCE_DIR}/core-module.service
             /etc/systemd/system/core-module.service
-    COMMAND systemctl daemon-reload
-    COMMAND systemctl enable core-module.service
     DEPENDS ${PROJECT_NAME}
     COMMENT "Installing core-module systemd service"
 )
