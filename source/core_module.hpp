@@ -10,10 +10,15 @@
 
 #include "interface_board.hpp"
 #include "rpi_host.hpp"
-#include "can/can_receiver.hpp"
+#include "can/can_interface.hpp"
 #include "can/app_message.hpp"
 
+#include "codes/messages/common/ping_request.hpp"
+#include "codes/messages/common/ping_response.hpp"
 #include "codes/messages/common/probe_modules_response.hpp"
+#include "codes/messages/common/core_load_response.hpp"
+#include "codes/messages/common/core_temp_response.hpp"
+#include "codes/messages/common/board_temp_response.hpp"
 
 /**
  * @brief   Core module class representing main application logic
@@ -22,9 +27,9 @@ class Core_module {
 private:
 
     /**
-     * @brief  CAN receiver for receiving messages from CAN BUS
+     * @brief  CAN interface for sending and receiving messages from CAN BUS
      */
-    CAN::Receiver *const can_receiver;
+    CAN::Interface *const can_interface;
 
     /**
      * @brief   Interface board hardware abstraction

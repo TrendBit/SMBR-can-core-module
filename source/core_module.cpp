@@ -2,11 +2,8 @@
 #include <iostream>
 #include <iomanip>
 
-#include<chrono>
-#include<thread>
-
 Core_module::Core_module(I2C_bus* bus):
-    can_receiver( new CAN::Receiver("can0")),
+    can_interface(new CAN::Interface("can0")),
     interface(new Interface_board(bus)),
     rpi(new RPi_host())
 {}
@@ -14,27 +11,6 @@ Core_module::Core_module(I2C_bus* bus):
 Core_module::~Core_module() {
     delete interface;
     delete rpi;
-}
-
-void Core_module::Run() {
-    std::cout << "Starting CAN message processing" << std::endl;
-    while(true){
-        Application_message message = can_receiver->Receiver_loop();
-
-        switch (message.Message_type()) {
-            case Codes::Message_type::Probe_modules_request:{
-                std::cout << "Module probe request received" << std::endl;
-                App_messages::Common::Probe_modules_response probe_response(rpi->Device_UID());
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                can_receiver->Send_message(probe_response);
-                break;
-            }
-
-            default:
-                std::cout << "Unknown message received" << std::endl;
-                break;
-        }
-    }
 }
 
 void Core_module::Probe() const {
@@ -79,4 +55,62 @@ void Core_module::Probe() const {
     }
 
     std::cout << "Hostname: " << rpi->Hostname() << std::endl;
+}
+
+void Core_module::Run() {
+    std::cout << "Starting CAN message processing" << std::endl;
+    while(true){
+
+        Application_message message = can_interface->Receiver_loop();
+        auto message_type = message.Message_type();
+
+        switch (message_type) {
+            case Codes::Message_type::Probe_modules_request:{
+                std::cout << "Module probe request received" << std::endl;
+                App_messages::Common::Probe_modules_response probe_response(rpi->Device_UID());
+                can_interface->Send_message(probe_response);
+                break;
+            }
+
+            case Codes::Message_type::Ping_request:{
+                std::cout << "Ping request received" << std::endl;
+                App_messages::Common::Ping_request ping_request;
+                if (!ping_request.Interpret_data(message.data)){
+                    std::cout << "Ping request data interpretation failed" << std::endl;
+                    break;
+                }
+                uint8_t sequence_number = ping_request.sequence_number;
+                App_messages::Common::Ping_response ping_response(sequence_number);
+                can_interface->Send_message(ping_response);
+                break;
+            }
+
+            case Codes::Message_type::Core_load_request:{
+                std::cout << "Core load request received" << std::endl;
+                App_messages::Common::Core_load_response core_load_response(rpi->Core_load());
+                can_interface->Send_message(core_load_response);
+                break;
+            }
+
+            case Codes::Message_type::Core_temperature_request:{
+                std::cout << "Core temperature request received" << std::endl;
+                App_messages::Common::Core_temp_response core_temp_response(rpi->Core_temperature());
+                can_interface->Send_message(core_temp_response);
+                break;
+            }
+
+            case Codes::Message_type::Board_temperature_request:{
+                std::cout << "Board temperature request received" << std::endl;
+                App_messages::Common::Board_temp_response board_temp_response(interface->Board_temperature());
+                can_interface->Send_message(board_temp_response);
+                break;
+            }
+
+
+
+            default:
+                std::cout << "Unknown message received" << std::endl;
+                break;
+        }
+    }
 }
