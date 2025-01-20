@@ -50,9 +50,12 @@ public:
     ~Core_module();
 
     /**
-     * @brief   Test function for hardware verification
+     * @brief   Test function for hardware verification, will try to execute all data suppliers and print their values
      */
-    void Test() const;
+    void Probe() const;
 
+    /**
+     * @brief   Main loop of core module, which is waiting for messages from CAN BUS and process them
+     */
     void Run();
 };
