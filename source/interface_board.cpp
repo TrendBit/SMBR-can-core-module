@@ -62,6 +62,9 @@ bool Interface_board::PoE_status()
 
 bool Interface_board::PoE_budget()
 {
+    if (not PoE_status()) {
+        return false;
+    }
     return poe_budget->Read();
 }
 
