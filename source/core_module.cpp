@@ -2,13 +2,13 @@
 #include <iostream>
 #include <iomanip>
 
-Core_module::Core_module(I2C_bus* bus):
+Core_module::Core_module(I2C_bus *bus) :
     can_interface(new CAN::Interface("can0")),
     interface(new Interface_board(bus)),
     rpi(new RPi_host())
-{}
+{ }
 
-Core_module::~Core_module() {
+Core_module::~Core_module(){
     delete interface;
     delete rpi;
 }
@@ -56,27 +56,26 @@ void Core_module::Probe() const {
 
     std::cout << "Hostname: " << rpi->Hostname() << std::endl;
     std::cout << "Serial number: " << rpi->Serial_number() << std::endl;
-}
+} // Core_module::Probe
 
-void Core_module::Run() {
+void Core_module::Run(){
     std::cout << "Starting CAN message processing" << std::endl;
-    while(true){
-
+    while (true) {
         Application_message message = can_interface->Receiver_loop();
         auto message_type = message.Message_type();
 
         switch (message_type) {
-            case Codes::Message_type::Probe_modules_request:{
+            case Codes::Message_type::Probe_modules_request: {
                 std::cout << "Module probe request received" << std::endl;
                 App_messages::Common::Probe_modules_response probe_response(rpi->Device_UID());
                 can_interface->Send_message(probe_response);
                 break;
             }
 
-            case Codes::Message_type::Ping_request:{
+            case Codes::Message_type::Ping_request: {
                 std::cout << "Ping request received" << std::endl;
                 App_messages::Common::Ping_request ping_request;
-                if (!ping_request.Interpret_data(message.data)){
+                if (!ping_request.Interpret_data(message.data)) {
                     std::cout << "Ping request data interpretation failed" << std::endl;
                     break;
                 }
@@ -86,24 +85,61 @@ void Core_module::Run() {
                 break;
             }
 
-            case Codes::Message_type::Core_load_request:{
+            case Codes::Message_type::Core_load_request: {
                 std::cout << "Core load request received" << std::endl;
                 App_messages::Common::Core_load_response core_load_response(rpi->Core_load());
                 can_interface->Send_message(core_load_response);
                 break;
             }
 
-            case Codes::Message_type::Core_temperature_request:{
+            case Codes::Message_type::Core_temperature_request: {
                 std::cout << "Core temperature request received" << std::endl;
                 App_messages::Common::Core_temp_response core_temp_response(rpi->Core_temperature());
                 can_interface->Send_message(core_temp_response);
                 break;
             }
 
-            case Codes::Message_type::Board_temperature_request:{
+            case Codes::Message_type::Board_temperature_request: {
                 std::cout << "Board temperature request received" << std::endl;
                 App_messages::Common::Board_temp_response board_temp_response(interface->Board_temperature());
                 can_interface->Send_message(board_temp_response);
+                break;
+            }
+
+            case Codes::Message_type::Core_SID_request: {
+                std::cout << "SID request received" << std::endl;
+                App_messages::Core::SID_response sid_response(rpi->Short_ID());
+                can_interface->Send_message(sid_response);
+                break;
+            }
+
+            case Codes::Message_type::Core_IP_request: {
+                std::cout << "IP request received" << std::endl;
+
+                App_messages::Core::IP_address_response ip_response;
+
+                auto ip = rpi->IP_address();
+                // If device does not have IP address, send 0.0.0.0
+                if (!ip.has_value()) {
+                    std::cout << "IP address not available" << std::endl;
+                } else  {
+                    ip_response.IP_address = ip.value();
+                }
+                can_interface->Send_message(ip_response);
+                break;
+            }
+
+            case Codes::Message_type::Core_hostname_request: {
+                std::cout << "Hostname request received" << std::endl;
+                App_messages::Core::Hostname_response hostname_response(rpi->Hostname());
+                can_interface->Send_message(hostname_response);
+                break;
+            }
+
+            case Codes::Message_type::Core_serial_request: {
+                std::cout << "Serial number request received" << std::endl;
+                App_messages::Core::Serial_response serial_response(rpi->Serial_number());
+                can_interface->Send_message(serial_response);
                 break;
             }
 
@@ -112,4 +148,4 @@ void Core_module::Run() {
                 break;
         }
     }
-}
+} // Core_module::Run

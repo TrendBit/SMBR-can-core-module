@@ -43,6 +43,10 @@ private:
         Codes::Message_type::Core_load_request,
         Codes::Message_type::Core_temperature_request,
         Codes::Message_type::Board_temperature_request,
+        Codes::Message_type::Core_SID_request,
+        Codes::Message_type::Core_IP_request,
+        Codes::Message_type::Core_hostname_request,
+        Codes::Message_type::Core_serial_request,
     };
 
 public:

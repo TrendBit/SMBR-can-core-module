@@ -19,6 +19,10 @@
 #include "codes/messages/common/core_load_response.hpp"
 #include "codes/messages/common/core_temp_response.hpp"
 #include "codes/messages/common/board_temp_response.hpp"
+#include "codes/messages/core/sid_response.hpp"
+#include "codes/messages/core/ip_response.hpp"
+#include "codes/messages/core/hostname_response.hpp"
+#include "codes/messages/core/serial_response.hpp"
 
 /**
  * @brief   Core module class representing main application logic
