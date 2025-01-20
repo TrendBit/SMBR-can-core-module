@@ -68,6 +68,13 @@ public:
      */
     std::optional<std::array<uint8_t, 4>> IP_address();
 
+    /**
+     * @brief   Get hostname of Raspberry Pi
+     *          Maximal supported length is 8 characters, longer are truncated, limited die to CAN payload size
+     * @return  std::string Hostname or empty string if error (8 chars max)
+     */
+    std::string Hostname();
+
 private:
     /**
      * @brief   Read serial number from /proc/cpuinfo

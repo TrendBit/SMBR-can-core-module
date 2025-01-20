@@ -95,3 +95,12 @@ std::optional<std::array<uint8_t, 4>> RPi_host::IP_address() {
     close(fd);
     return {};
 }
+
+std::string RPi_host::Hostname() {
+    char hostname[256];
+    if (gethostname(hostname, sizeof(hostname)) == 0) {
+        std::string host(hostname);
+        return host.substr(0, 8);  // Limit to 8 characters
+    }
+    return "";
+}
