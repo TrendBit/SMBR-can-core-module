@@ -1,5 +1,5 @@
 /**
- * @file can_receiver.hpp
+ * @file can_interface.hpp
  * @author Petr Malaník (TheColonelYoung(at)gmail(dot)com)
  * @version 0.1
  * @date 18.01.2025
@@ -7,19 +7,21 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstring>
+#include <chrono>
+#include <iostream>
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #include <net/if.h>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
-#include <iostream>
-#include <algorithm>
-#include <optional>
 
 #include "codes/codes.hpp"
 #include "can/can_message.hpp"
@@ -27,7 +29,7 @@
 
 namespace CAN {
 
-class Receiver {
+class Interface {
 private:
     int socket_fd;
 
@@ -36,13 +38,17 @@ private:
     const Codes::Instance instance = Codes::Instance::Exclusive;
 
     std::vector<Codes::Message_type> accepted_messages = {
+        Codes::Message_type::Ping_request,
         Codes::Message_type::Probe_modules_request,
+        Codes::Message_type::Core_load_request,
+        Codes::Message_type::Core_temperature_request,
+        Codes::Message_type::Board_temperature_request,
     };
 
 public:
-    Receiver(const std::string& interface);
+    Interface(const std::string& interface);
 
-    ~Receiver();
+    ~Interface();
 
     Application_message Receiver_loop();
 

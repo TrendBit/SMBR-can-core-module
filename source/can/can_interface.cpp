@@ -1,18 +1,18 @@
-#include "can_receiver.hpp"
+#include "can_interface.hpp"
 
-CAN::Receiver::Receiver(const std::string& interface){
+CAN::Interface::Interface(const std::string& interface){
     if (!Init_socket(interface)) {
         throw std::runtime_error("Failed to initialize CAN socket");
     }
 }
 
-CAN::Receiver::~Receiver(){
+CAN::Interface::~Interface(){
     if (socket_fd >= 0) {
         close(socket_fd);
     }
 }
 
-bool CAN::Receiver::Init_socket(const std::string& interface){
+bool CAN::Interface::Init_socket(const std::string& interface){
     socket_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW);
     if (socket_fd < 0) {
         return false;
@@ -41,7 +41,7 @@ bool CAN::Receiver::Init_socket(const std::string& interface){
     return true;
 }
 
-Application_message CAN::Receiver::Receiver_loop(){
+Application_message CAN::Interface::Receiver_loop(){
     struct can_frame frame;
 
     while (true) {
@@ -69,14 +69,17 @@ Application_message CAN::Receiver::Receiver_loop(){
     }
 }
 
-bool CAN::Receiver::Send_message(const Application_message& message) {
+bool CAN::Interface::Send_message(const Application_message& message) {
     struct can_frame frame = message.to_msg();
+
+    // Wait in order to suppress CAN bus overload
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     ssize_t nbytes = write(socket_fd, &frame, sizeof(struct can_frame));
     return nbytes == sizeof(struct can_frame);
 }
 
-std::optional<Codes::Message_type> CAN::Receiver::Process_message(Application_message &app_message){
+std::optional<Codes::Message_type> CAN::Interface::Process_message(Application_message &app_message){
     Codes::Module target_module = app_message.Module_type();
     if ((target_module != Codes::Module::All) and (target_module != Codes::Module::Any) and (target_module != module_type)) {
         std::cout << "Message for different module" << std::endl;
