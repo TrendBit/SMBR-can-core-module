@@ -47,6 +47,12 @@ private:
         Codes::Message_type::Core_IP_request,
         Codes::Message_type::Core_hostname_request,
         Codes::Message_type::Core_serial_request,
+        Codes::Message_type::Supply_type_request,
+        Codes::Message_type::Supply_5V_rail_request,
+        Codes::Message_type::Supply_VIN_rail_request,
+        Codes::Message_type::Supply_POE_rail_request,
+        Codes::Message_type::Supply_current_request,
+        Codes::Message_type::Supply_power_draw_request,
     };
 
 public:

@@ -143,6 +143,49 @@ void Core_module::Run(){
                 break;
             }
 
+            case Codes::Message_type::Supply_type_request: {
+                std::cout << "Supply type request received" << std::endl;
+                App_messages::Core::Supply_type_response supply_response(interface->Vin_status(), interface->PoE_status(), interface->PoE_budget());
+                can_interface->Send_message(supply_response);
+                break;
+            }
+
+            case Codes::Message_type::Supply_5V_rail_request: {
+                std::cout << "5V rail request received" << std::endl;
+                App_messages::Core::Supply_5V_rail_response supply_response(interface->Voltage_5V());
+                can_interface->Send_message(supply_response);
+                break;
+            }
+
+            case Codes::Message_type::Supply_VIN_rail_request: {
+                std::cout << "VIN rail request received" << std::endl;
+                App_messages::Core::Supply_VIN_rail_response supply_response(interface->Voltage_Vin());
+                can_interface->Send_message(supply_response);
+                break;
+            }
+
+            case Codes::Message_type::Supply_POE_rail_request: {
+                std::cout << "PoE rail request received" << std::endl;
+                App_messages::Core::Supply_POE_rail_response supply_response(interface->Voltage_PoE());
+                can_interface->Send_message(supply_response);
+                break;
+            }
+
+            case Codes::Message_type::Supply_current_request: {
+                std::cout << "Current request received" << std::endl;
+                App_messages::Core::Supply_current_response supply_response(interface->Current());
+                can_interface->Send_message(supply_response);
+                break;
+            }
+
+            case Codes::Message_type::Supply_power_draw_request: {
+                std::cout << "Power draw request received" << std::endl;
+                App_messages::Core::Supply_power_draw_response supply_response(interface->Power_draw());
+                can_interface->Send_message(supply_response);
+                break;
+            }
+
+
             default:
                 std::cout << "Unknown message received" << std::endl;
                 break;

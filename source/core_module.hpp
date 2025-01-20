@@ -23,6 +23,12 @@
 #include "codes/messages/core/ip_response.hpp"
 #include "codes/messages/core/hostname_response.hpp"
 #include "codes/messages/core/serial_response.hpp"
+#include "codes/messages/core/supply_type_response.hpp"
+#include "codes/messages/core/supply_5v_rail_response.hpp"
+#include "codes/messages/core/supply_vin_rail_response.hpp"
+#include "codes/messages/core/supply_poe_rail_response.hpp"
+#include "codes/messages/core/supply_current_response.hpp"
+#include "codes/messages/core/supply_power_draw_response.hpp"
 
 /**
  * @brief   Core module class representing main application logic
