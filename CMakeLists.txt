@@ -10,6 +10,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -pedantic -pg")
 
 # Find required packages
 find_package(Threads REQUIRED)
+find_package(OpenSSL 3.0 REQUIRED)
 find_library(PIGPIO_LIBRARY pigpio REQUIRED)
 find_library(RT_LIBRARY rt REQUIRED)
 
@@ -28,8 +29,9 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 # Link libraries
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        ${PIGPIO_LIBRARY}
         Threads::Threads
+        OpenSSL::Crypto
+        ${PIGPIO_LIBRARY}
         ${RT_LIBRARY}
 )
 

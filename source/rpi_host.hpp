@@ -25,6 +25,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
+#include <openssl/sha.h>
 
 /**
  * @brief   Class for reading system info from Raspberry Pi

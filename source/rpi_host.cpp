@@ -55,26 +55,17 @@ std::string RPi_host::Read_serial(){
     return "";
 }
 
-std::array<uint8_t, 6> RPi_host::Hash(const std::string& input){
-    const std::string salt   = "SMPBR-core";
-    std::string salted_input = input + salt;
+std::array<uint8_t, 6> RPi_host::Hash(const std::string& input) {
+    // Compute SHA-256 hash
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256(reinterpret_cast<const unsigned char*>(input.data()), input.size(), hash);
 
-    uint64_t hash = 0x1234567890ABCDEF; // Initial seed
-
-    // Deterministic hash function, variant of std::hash
-    for (char c : salted_input) {
-        hash ^= static_cast<uint64_t>(c);
-        hash  = (hash << 7) | (hash >> 57);
-        hash *= 0x1234567890ABCDEF;
+    // Extract the first 6 bytes
+    std::array<uint8_t, 6> result;
+    for (size_t i = 0; i < 6; ++i) {
+        result[i] = hash[i];
     }
 
-    std::array<uint8_t, 6> result;
-    result[0] = (hash >> 40) & 0xFF;
-    result[1] = (hash >> 32) & 0xFF;
-    result[2] = (hash >> 24) & 0xFF;
-    result[3] = (hash >> 16) & 0xFF;
-    result[4] = (hash >> 8) & 0xFF;
-    result[5] = hash & 0xFF;
     return result;
 }
 
