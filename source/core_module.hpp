@@ -33,6 +33,7 @@
 #include "codes/messages/common/fw_hash_response.hpp"
 #include "codes/messages/common/fw_dirty_response.hpp"
 #include "codes/messages/common/hw_version_response.hpp"
+#include "codes/messages/core/model_response.hpp"
 
 /**
  * @brief   Firmware version information - Major version number

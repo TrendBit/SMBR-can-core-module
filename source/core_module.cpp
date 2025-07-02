@@ -223,6 +223,13 @@ void Core_module::Run(){
                 break;
             }
 
+            case Codes::Message_type::Core_model_request: {
+                std::cout << "Model request received" << std::endl;
+                App_messages::Core::Model_response model_response(rpi->Model());
+                can_interface->Send_message(model_response);
+                break;
+            }
+
             default:
                 std::cout << "Unknown message received" << std::endl;
                 break;
