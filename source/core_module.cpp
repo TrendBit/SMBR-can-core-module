@@ -56,6 +56,14 @@ void Core_module::Probe() const {
 
     std::cout << "Hostname: " << rpi->Hostname() << std::endl;
     std::cout << "Serial number: " << rpi->Serial_number() << std::endl;
+
+    std::cout << "Model: " << rpi->Model() << std::endl;
+    std::cout << "Hardware revision: " << rpi->HW_revision().major << "." << rpi->HW_revision().minor << std::endl;
+
+    std::cout << "Firmware version: " << fw_version.major << "." << fw_version.minor << "." << fw_version.patch << std::endl;
+    std::cout << "Firmware git commit: " << std::hex << fw_hash << std::dec << std::endl;
+    std::cout << "Firmware dirty: " << (fw_dirty ? "Yes" : "No") << std::endl;
+
 } // Core_module::Probe
 
 void Core_module::Run(){

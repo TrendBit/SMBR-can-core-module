@@ -29,12 +29,67 @@
 #include "codes/messages/core/supply_poe_rail_response.hpp"
 #include "codes/messages/core/supply_current_response.hpp"
 #include "codes/messages/core/supply_power_draw_response.hpp"
+#include "codes/messages/common/fw_version_response.hpp"
+#include "codes/messages/common/fw_hash_response.hpp"
+#include "codes/messages/common/fw_dirty_response.hpp"
+#include "codes/messages/common/hw_version_response.hpp"
+
+/**
+ * @brief   Firmware version information - Major version number
+ */
+#ifndef FW_VERSION_MAJOR
+    #define FW_VERSION_MAJOR 0
+#endif
+
+/**
+ * @brief   Firmware version information - Minor version number
+ */
+#ifndef FW_VERSION_MINOR
+    #define FW_VERSION_MINOR 0
+#endif
+
+/**
+ * @brief   Firmware version information - Patch version number
+ */
+#ifndef FW_VERSION_PATCH
+    #define FW_VERSION_PATCH 0
+#endif
+
+/**
+ * @brief   Firmware version information - Git commit hash as uint64_t
+ */
+#ifndef FW_GIT_COMMIT_HASH_HEX
+    #define FW_GIT_COMMIT_HASH_HEX 0x0000000
+#endif
+
+#ifndef FW_GIT_DIRTY
+    #define FW_GIT_DIRTY true
+#endif
 
 /**
  * @brief   Core module class representing main application logic
  */
 class Core_module {
 private:
+
+    /**
+     * @brief  Structure holding firmware version information passed by compiler based on git tags
+     */
+    const struct{
+        uint16_t major = FW_VERSION_MAJOR;
+        uint16_t minor = FW_VERSION_MINOR;
+        uint16_t patch = FW_VERSION_PATCH;
+    } fw_version ;
+
+    /**
+     * @brief Actual commit hash of firmware as uint64_t
+     */
+    const uint64_t fw_hash = FW_GIT_COMMIT_HASH_HEX;
+
+    /**
+     * @brief Flag indicating if firmware repository is dirty (modified)
+     */
+    const bool fw_dirty = FW_GIT_DIRTY;
 
     /**
      * @brief  CAN interface for sending and receiving messages from CAN BUS
@@ -73,4 +128,5 @@ public:
      * @brief   Main loop of core module, which is waiting for messages from CAN BUS and process them
      */
     void Run();
+
 };
