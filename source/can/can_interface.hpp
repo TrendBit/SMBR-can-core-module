@@ -53,6 +53,11 @@ private:
         Codes::Message_type::Supply_POE_rail_request,
         Codes::Message_type::Supply_current_request,
         Codes::Message_type::Supply_power_draw_request,
+        Codes::Message_type::Core_fw_version_request,
+        Codes::Message_type::Core_fw_hash_request,
+        Codes::Message_type::Core_fw_dirty_request,
+        Codes::Message_type::Core_hw_version_request,
+        Codes::Message_type::Core_model_request,
     };
 
 public:
