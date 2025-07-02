@@ -57,6 +57,63 @@ std::string RPi_host::Read_serial(){
     return "";
 }
 
+RPi_host::hw_revision RPi_host::HW_revision(){
+    std::ifstream cpuinfo("/proc/cpuinfo");
+    std::string line;
+    std::string revision = "0.0";
+
+    while (std::getline(cpuinfo, line)) {
+        if (line.find("Model") != std::string::npos) {
+            revision = line.substr(line.find("Rev") + 4);
+        }
+    }
+
+    size_t dot_pos = revision.find('.');
+    if (dot_pos != std::string::npos) {
+        hw_revision rev;
+        int major = 0, minor = 0;
+        const std::string major_str = revision.substr(0, dot_pos);
+        const std::string minor_str = revision.substr(dot_pos + 1);
+
+        // Check if both parts are digits
+        if (!major_str.empty() && std::all_of(major_str.begin(), major_str.end(), ::isdigit) &&
+            !minor_str.empty() && std::all_of(minor_str.begin(), minor_str.end(), ::isdigit)) {
+            major = std::stoi(major_str);
+            minor = std::stoi(minor_str);
+        } else {
+            return {0, 0};
+        }
+
+        rev.major = major;
+        rev.minor = minor;
+        return rev;
+    }
+
+    return {0, 0};
+}
+
+std::string RPi_host::Model() {
+    std::ifstream cpuinfo("/proc/cpuinfo");
+    std::string line;
+
+    while (std::getline(cpuinfo, line)) {
+        if (line.find("Model") != std::string::npos) {
+            // Extract model name
+            size_t start = line.find(":") + 2; // Skip ": "
+            size_t end = line.find("Rev")  -1; // Up to " Rev"
+            std::string model = line.substr(start, end - start);
+
+            // Check if model is in predefined names
+            for (const auto& [key, value] : model_names) {
+                if (model.find(key) != std::string::npos) {
+                    return value; // Return the mapped name
+                }
+            }
+        }
+    }
+    return "Unknown";
+}
+
 std::array<uint8_t, 6> RPi_host::Hash(const std::string& input) {
     // Compute SHA-256 hash using poco crypto
     Poco::Crypto::DigestEngine engine("SHA256");

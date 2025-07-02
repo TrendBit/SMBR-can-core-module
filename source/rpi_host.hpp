@@ -12,6 +12,7 @@
 #include <fstream>
 #include <string>
 #include <array>
+#include <map>
 #include <cstdint>
 #include <sstream>
 #include <iomanip>
@@ -31,11 +32,23 @@
  * @brief   Class for reading system info from Raspberry Pi
  */
 class RPi_host {
+private:
+    static const inline std::map<std::string, std::string> model_names = {
+        {"Raspberry Pi 4 Model B", "RPi4B"},
+        {"Raspberry Pi 3 Model B+", "RPi3B+"},
+        {"Raspberry Pi Zero W", "RPiZ2W"},
+    };
+
 public:
     /**
      * @brief Construct a new RPi object
      */
     RPi_host() = default;
+
+    struct hw_revision{
+        uint16_t major;
+        uint16_t minor;
+    };
 
     /**
      * @brief   Read core temperature from Raspberry Pi
@@ -82,6 +95,23 @@ public:
      * @return  uint32_t Serial number
      */
     uint32_t Serial_number();
+
+    /**
+     * @brief   Get hardware revision of Raspberry Pi
+     *
+     * @return  hw_revision struct containing major and minor revision numbers
+     */
+    hw_revision HW_revision();
+
+    /**
+     * @brief   Model of Raspberry Pi, max 8 characters allowed, read from /proc/cpuinfo
+     *          Example:
+     *          - "Raspberry Pi 4 Model B" = "RPi4B"
+     *
+     * @return std::string  Model name or empty string if not found
+     */
+    std::string Model();
+
 
 private:
     /**
