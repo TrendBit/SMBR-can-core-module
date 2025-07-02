@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <Poco/Crypto/DigestEngine.h>
+
 float RPi_host::Core_temperature(){
     std::ifstream temp_file("/sys/class/thermal/thermal_zone0/temp");
     if (!temp_file.is_open()) {
@@ -56,14 +58,15 @@ std::string RPi_host::Read_serial(){
 }
 
 std::array<uint8_t, 6> RPi_host::Hash(const std::string& input) {
-    // Compute SHA-256 hash
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256(reinterpret_cast<const unsigned char*>(input.data()), input.size(), hash);
+    // Compute SHA-256 hash using poco crypto
+    Poco::Crypto::DigestEngine engine("SHA256");
+    engine.update(input);
+    const auto& digest = engine.digest();
 
     // Extract the first 6 bytes
     std::array<uint8_t, 6> result;
     for (size_t i = 0; i < 6; ++i) {
-        result[i] = hash[i];
+        result[i] = digest[i];
     }
 
     return result;
