@@ -193,6 +193,35 @@ void Core_module::Run(){
                 break;
             }
 
+            case Codes::Message_type::Core_fw_version_request: {
+                std::cout << "Firmware version request received" << std::endl;
+                App_messages::Common::FW_version_response fw_version_response(
+                    fw_version.major, fw_version.minor, fw_version.patch);
+                can_interface->Send_message(fw_version_response);
+                break;
+            }
+
+            case Codes::Message_type::Core_fw_hash_request: {
+                std::cout << "Firmware git commit request received" << std::endl;
+                App_messages::Common::FW_hash_response fw_hash_response(fw_hash);
+                can_interface->Send_message(fw_hash_response);
+                break;
+            }
+
+            case Codes::Message_type::Core_fw_dirty_request: {
+                std::cout << "Firmware dirty request received" << std::endl;
+                App_messages::Common::FW_dirty_response fw_dirty_response(fw_dirty);
+                can_interface->Send_message(fw_dirty_response);
+                break;
+            }
+
+            case Codes::Message_type::Core_hw_version_request: {
+                std::cout << "Hardware revision request received" << std::endl;
+                auto hw_version = rpi->HW_revision();
+                App_messages::Common::HW_version_response hw_version_response(hw_version.major, hw_version.minor);
+                can_interface->Send_message(hw_version_response);
+                break;
+            }
 
             default:
                 std::cout << "Unknown message received" << std::endl;
